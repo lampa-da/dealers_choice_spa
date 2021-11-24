@@ -6,20 +6,37 @@ const routeList = document.querySelector('#route-list')
 
 console.log(catList, planetList, routeList)
 
+let cats, planingRoutes
+
 const renderCats =(cats)=>{
+  const catId = window.location.hash.slice(1)
   const html = cats.map( cat =>`
-  <li>
+  <li class='${cat.id === catId ? 'selected': ''}'>
     <a href='#${cat.id}'>${cat.breed} cat "${cat.name}"</a>
   </li>
   `).join('')
   catList.innerHTML = html
 }
 
+planetList.addEventListener('click', async(ev)=>{
+  const target =ev.target
+  const catId = window.location.hash.slice(1)
+  if(target.tagName === 'BUTTON'){
+    const _planingRoute ={
+      planetId: target.getAttribute('data-id')
+    }
+    const response = await axios.post(`/api/cats/${catId}/planing_route`, _planingRoute)
+    const planingRoute = response.data
+    planingRoutes.push(planingRoute)
+    renderRoutes(planingRoutes)
+  }
+})
+
 const renderPlanets =(planets)=>{
   const html = planets.map( planet =>`
-  <li>
+  <button data-id='${planet.id}'>
     ${planet.name}
-  </li>
+  </button>
   `).join('')
   planetList.innerHTML = html
 }
@@ -35,15 +52,17 @@ const renderRoutes =(planingRoutes)=>{
 
 const init = async()=>{
   try{
-    const cats = (await axios.get('/api/cats')).data
+    cats = (await axios.get('/api/cats')).data
     const planets = (await axios.get('/api/planets')).data
     renderCats(cats)
     renderPlanets(planets)
     const catId = window.location.hash.slice(1)
-    const url = `api/cats/${catId}/planing_route`
-    console.log(url)
-    const planingRoute = (await axios(url)).data
-    renderRoutes(planingRoute)
+    if(catId){
+      const url = `api/cats/${catId}/planing_route`
+      console.log(url)
+      planingRoutes = (await axios(url)).data
+      renderRoutes(planingRoutes)
+    }
   }
   catch(ex){
     console.log(ex)
@@ -53,8 +72,9 @@ const init = async()=>{
  window.addEventListener('hashchange', async()=>{
    const catId = window.location.hash.slice(1)
    const url = `api/cats/${catId}/planing_route`
-   const planingRoute = (await axios(url)).data
-   renderRoutes(planingRoute)
+   planingRoutes = (await axios(url)).data
+   renderRoutes(planingRoutes)
+   renderCats(cats)
  })
  
  

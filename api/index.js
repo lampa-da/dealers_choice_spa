@@ -34,5 +34,17 @@ router.get('/cats/:id/planing_route', async(req, res, next)=>{
   }
 })
 
+router.post('/cats/:id/planing_route', async(req, res, next)=>{
+  try{
+      let planingRoute = await PlaningRoute.create({...req.body, catId: req.params.id})
+      planingRoute = await PlaningRoute.findByPk(planingRoute.id, {
+        include: [Planet]
+      })
+      res.send(planingRoute)
+  }
+  catch(ex){
+    next(ex)
+  }
+})
 
 module.exports = router
