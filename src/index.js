@@ -19,16 +19,27 @@ const renderCats =(cats)=>{
 }
 
 planetList.addEventListener('click', async(ev)=>{
-  const target =ev.target
+  const target = ev.target
   const catId = window.location.hash.slice(1)
-  if(target.tagName === 'BUTTON' && target.id === 'add-btn'){
-    console.log(target.id)
+  if(target.tagName === 'BUTTON'){
     const _planingRoute ={
       planetId: target.getAttribute('data-id')
     }
     const response = await axios.post(`/api/cats/${catId}/planing_route`, _planingRoute)
     const planingRoute = response.data
+    console.log(planingRoute)
     planingRoutes.push(planingRoute)
+    renderRoutes(planingRoutes)
+  }
+})
+
+routeList.addEventListener('click', async(ev)=>{
+  const target = ev.target
+  if(target.tagName === 'BUTTON' ){
+    const planingRouteId = target.getAttribute('data-id').substring(0, (target.getAttribute('data-id')).length - 4)
+    const response = await axios.delete(`/api/planing_routes/${planingRouteId}`)
+    const planingRoute = response.config.url.replace("/api/planing_routes/", "")
+    planingRoutes = planingRoutes.filter(route => route.id !== planingRoute)
     renderRoutes(planingRoutes)
   }
 })
@@ -46,8 +57,8 @@ const renderRoutes =(planingRoutes)=>{
   const html = planingRoutes.map( planingRoute =>`
   <li>
     ${planingRoute.planet.name}
+    <button data-id='${planingRoute.id} id='delete-btn'>x</button>
   </li>
-  <button id='delete-btn'>x</button>
   `).join('')
   routeList.innerHTML = html
 }

@@ -47,4 +47,34 @@ router.post('/cats/:id/planing_route', async(req, res, next)=>{
   }
 })
 
+
+router.get('/planing_routes', async(req, res, next)=> {
+  try {
+    res.send( await PlaningRoute.findAll());
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
+router.post('/planing_routes', async(req, res, next)=> {
+  try {
+    res.send(res.send( await PlaningRoute.create(req.body)));
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
+
+router.delete('/planing_routes/:id', async(req, res, next)=> {
+  try {
+    await PlaningRoute.destroy({ where: { id: req.params.id }});
+    res.sendStatus(204);
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
 module.exports = router
