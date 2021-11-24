@@ -21,7 +21,8 @@ const renderCats =(cats)=>{
 planetList.addEventListener('click', async(ev)=>{
   const target =ev.target
   const catId = window.location.hash.slice(1)
-  if(target.tagName === 'BUTTON'){
+  if(target.tagName === 'BUTTON' && target.id === 'add-btn'){
+    console.log(target.id)
     const _planingRoute ={
       planetId: target.getAttribute('data-id')
     }
@@ -34,7 +35,7 @@ planetList.addEventListener('click', async(ev)=>{
 
 const renderPlanets =(planets)=>{
   const html = planets.map( planet =>`
-  <button data-id='${planet.id}'>
+  <button data-id='${planet.id}' id='add-btn'>
     ${planet.name}
   </button>
   `).join('')
@@ -46,6 +47,7 @@ const renderRoutes =(planingRoutes)=>{
   <li>
     ${planingRoute.planet.name}
   </li>
+  <button id='delete-btn'>x</button>
   `).join('')
   routeList.innerHTML = html
 }
