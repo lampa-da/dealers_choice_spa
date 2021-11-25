@@ -29,7 +29,8 @@ const PlaningRoute = conn.define('planing_route', {
   id: {
     type: UUID,
     defaultValue: UUIDV4,
-    primaryKey: true
+    primaryKey: true,
+    // autoIncrement: true
   }
 })
 

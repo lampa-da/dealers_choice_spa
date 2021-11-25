@@ -22,21 +22,39 @@ planetList.addEventListener('click', async(ev)=>{
   const target = ev.target
   const catId = window.location.hash.slice(1)
   if(target.tagName === 'BUTTON'){
+    let planetId = target.getAttribute('data-id')
     const _planingRoute ={
-      planetId: target.getAttribute('data-id')
+      planetId: planetId
     }
-    const response = await axios.post(`/api/cats/${catId}/planing_route`, _planingRoute)
-    const planingRoute = response.data
-    console.log(planingRoute)
-    planingRoutes.push(planingRoute)
-    renderRoutes(planingRoutes)
+    let currRoute = await axios.get(`/api/cats/${catId}/planing_route`, _planingRoute)
+    if(currRoute.data.length === 0){
+      const response = await axios.post(`/api/cats/${catId}/planing_route`, _planingRoute)
+      const planingRoute = response.data
+      console.log(planingRoute)
+      planingRoutes.push(planingRoute)
+      renderRoutes(planingRoutes)
+    }
+    else {
+      let lastStop = currRoute.data[currRoute.data.length - 1].planetId
+      renderRoutes(currRoute.data)
+      if(planetId === lastStop){
+        alert ('Choose the other planet to fly. The cat is already on this one')
+      }
+      else{
+        const response = await axios.post(`/api/cats/${catId}/planing_route`, _planingRoute)
+        const planingRoute = response.data
+        // console.log(planingRoute)
+        planingRoutes.push(planingRoute)
+        renderRoutes(planingRoutes)
+      }
+    }
   }
 })
 
 routeList.addEventListener('click', async(ev)=>{
   const target = ev.target
   if(target.tagName === 'BUTTON' ){
-    const planingRouteId = target.getAttribute('data-id').substring(0, (target.getAttribute('data-id')).length - 4)
+    const planingRouteId = target.getAttribute('data-id')
     const response = await axios.delete(`/api/planing_routes/${planingRouteId}`)
     const planingRoute = response.config.url.replace("/api/planing_routes/", "")
     planingRoutes = planingRoutes.filter(route => route.id !== planingRoute)
@@ -57,7 +75,7 @@ const renderRoutes =(planingRoutes)=>{
   const html = planingRoutes.map( planingRoute =>`
   <li>
     ${planingRoute.planet.name}
-    <button data-id='${planingRoute.id} id='delete-btn'>x</button>
+    <button data-id='${planingRoute.id}' id='delete-btn'>x</button>
   </li>
   `).join('')
   routeList.innerHTML = html
